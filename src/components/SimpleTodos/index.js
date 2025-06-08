@@ -21,7 +21,6 @@ class SimpleTodos extends Component {
   state = {
     todosList: initialTodosList,
     titleInput: '',
-    countInput: '',
     nextId: 9,
   }
 
@@ -29,69 +28,58 @@ class SimpleTodos extends Component {
     this.setState({titleInput: event.target.value})
   }
 
-  onChangeCount = event => {
-    this.setState({countInput: event.target.value})
-  }
-
   addTodo = () => {
-    const {titleInput, countInput, todosList, nextId} = this.state
+    const {titleInput, nextId} = this.state
 
-    if (titleInput === '') {
-      return
-    }
+    if (titleInput.trim() === '') return
 
-    const count = Number(countInput)
+    // Extract number at end (optional)
+    const match = titleInput.trim().match(/^(.*?)(?:\s+(\d+))?$/)
+    const baseTitle = match[1].trim()
+    const count = match[2] ? parseInt(match[2], 10) : 1
+
+    if (baseTitle === '') return
+
     const newTodos = []
-    let num = 1
-
-    if (!isNaN(count) && count > 1) {
-      num = count
-    }
-
-    for (let i = 0; i < num; i++) {
-      const newTodo = {
+    for (let i = 0; i < count; i += 1) {
+      newTodos.push({
         id: nextId + i,
-        title: titleInput,
+        title: baseTitle,
         isCompleted: false,
-      }
-      newTodos.push(newTodo)
+      })
     }
 
-    this.setState({
-      todosList: [...todosList, ...newTodos],
+    this.setState(prevState => ({
+      todosList: [...prevState.todosList, ...newTodos],
       titleInput: '',
-      countInput: '',
-      nextId: nextId + newTodos.length,
-    })
+      nextId: prevState.nextId + count,
+    }))
   }
 
   deleteTodo = id => {
-    const updatedList = this.state.todosList.filter(todo => todo.id !== id)
-    this.setState({todosList: updatedList})
+    this.setState(prevState => ({
+      todosList: prevState.todosList.filter(todo => todo.id !== id),
+    }))
   }
 
   toggleComplete = id => {
-    const updatedList = this.state.todosList.map(todo => {
-      if (todo.id === id) {
-        return {...todo, isCompleted: !todo.isCompleted}
-      }
-      return todo
-    })
-    this.setState({todosList: updatedList})
+    this.setState(prevState => ({
+      todosList: prevState.todosList.map(todo =>
+        todo.id === id ? {...todo, isCompleted: !todo.isCompleted} : todo,
+      ),
+    }))
   }
 
   editTodo = (id, newTitle) => {
-    const updatedList = this.state.todosList.map(todo => {
-      if (todo.id === id) {
-        return {...todo, title: newTitle}
-      }
-      return todo
-    })
-    this.setState({todosList: updatedList})
+    this.setState(prevState => ({
+      todosList: prevState.todosList.map(todo =>
+        todo.id === id ? {...todo, title: newTitle} : todo,
+      ),
+    }))
   }
 
   render() {
-    const {todosList, titleInput, countInput} = this.state
+    const {todosList, titleInput} = this.state
 
     return (
       <div className="app-container">
@@ -103,12 +91,6 @@ class SimpleTodos extends Component {
               placeholder="Enter todo title"
               value={titleInput}
               onChange={this.onChangeTitle}
-            />
-            <input
-              type="number"
-              placeholder="Count"
-              value={countInput}
-              onChange={this.onChangeCount}
             />
             <button type="button" onClick={this.addTodo}>
               ADD

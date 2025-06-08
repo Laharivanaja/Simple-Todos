@@ -2,33 +2,34 @@ import {Component} from 'react'
 import './index.css'
 
 class TodoItem extends Component {
-  state = {
-    isEditing: false,
-    inputValue: this.props.todoDetails.title,
+  constructor(props) {
+    super(props)
+    const {todoDetails} = props
+    this.state = {
+      isEditing: false,
+      inputValue: todoDetails.title,
+    }
   }
 
   onDelete = () => {
     const {deleteTodo, todoDetails} = this.props
-    const {id} = todoDetails
-    deleteTodo(id)
+    deleteTodo(todoDetails.id)
   }
 
   onCheckboxChange = () => {
     const {toggleComplete, todoDetails} = this.props
-    const {id} = todoDetails
-    toggleComplete(id)
+    toggleComplete(todoDetails.id)
   }
 
   onEditToggle = () => {
     const {editTodo, todoDetails} = this.props
-    const {id} = todoDetails
     const {isEditing, inputValue} = this.state
 
     if (isEditing) {
-      editTodo(id, inputValue)
+      editTodo(todoDetails.id, inputValue)
     }
 
-    this.setState({isEditing: !isEditing})
+    this.setState(prevState => ({isEditing: !prevState.isEditing}))
   }
 
   onChangeInput = event => {
@@ -38,7 +39,7 @@ class TodoItem extends Component {
   render() {
     const {todoDetails} = this.props
     const {isEditing, inputValue} = this.state
-    const {title, isCompleted} = todoDetails
+    const {isCompleted, title} = todoDetails
 
     return (
       <li className="todo-item">
@@ -52,10 +53,12 @@ class TodoItem extends Component {
         ) : (
           <p className={isCompleted ? 'title completed' : 'title'}>{title}</p>
         )}
-        <button onClick={this.onEditToggle}>
+        <button type="button" onClick={this.onEditToggle}>
           {isEditing ? 'Save' : 'Edit'}
         </button>
-        <button onClick={this.onDelete}>Delete</button>
+        <button type="button" onClick={this.onDelete}>
+          Delete
+        </button>
       </li>
     )
   }
