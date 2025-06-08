@@ -45,3 +45,7 @@
     margin-left: 32px;
   }
 }
+.title.completed {
+  text-decoration: line-through;
+  color: gray;
+}

@@ -47,3 +47,7 @@
 .todos-list {
   padding-left: 0px;
 }
+.title.completed {
+  text-decoration: line-through;
+  color: gray;
+}
